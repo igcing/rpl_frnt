@@ -1,0 +1,62 @@
+<form [formGroup]="formGroup">
+  <div class="container">
+    <h3>Buscar Destinatario </h3>
+    <mat-form-field appearance="fill">
+      <mat-label>Rut (sin puntos ni guión, ej: 123456789)</mat-label>
+      <input matInput formControlName="rut">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="nombre">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Teléfono</mat-label>
+      <input matInput formControlName="telefono">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email">
+    </mat-form-field>
+
+
+    <mat-form-field appearance="fill">
+      <mat-label>Banco </mat-label>
+      <mat-select formControlName="banco">
+        <mat-option *ngFor="let bank of bancos" [value]="bank.id">{{bank.name}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Tipo de Cuenta </mat-label>
+      <mat-select formControlName="tipo_cuenta">
+        <mat-option value="1">Cuenta Corriente</mat-option>
+        <mat-option value="2">Cuenta Vista</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>N° de Cuenta</mat-label>
+      <input matInput formControlName="numero_cuenta">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Monto a transferir</mat-label>
+      <input matInput formControlName="monto">
+    </mat-form-field>
+
+    <div class="container-button">
+      <div *ngIf="spinner">
+        <mat-spinner></mat-spinner>
+      </div>
+      <div *ngIf="!spinner">
+        <button mat-raised-button color="primary" class="align_button" (click)="buscarDestinatario()">Buscar</button>
+        <button mat-raised-button color="primary" [disabled]="!isActiveToTransfer" class="align_button2"
+          (click)="enviarTransferencia()">Transferir</button>
+      </div>
+    </div>
+  </div>
+
+</form>

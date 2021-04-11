@@ -1,0 +1,59 @@
+
+
+    <form [formGroup]="formGroup" >
+    <div class="container">
+    <h3>Nuevo Destinatario </h3>
+    <div *ngIf="!isValid" >
+        <mat-label >{{messageValid}}</mat-label>
+    </div>
+        <mat-form-field appearance="fill">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Rut (sin puntos ni guión)</mat-label>
+            <input matInput formControlName="rut" (change)="formatRut()">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Correo</mat-label>
+            <input matInput formControlName="correo">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="telefono">
+        </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Banco </mat-label>
+            <mat-select formControlName="banco">
+                <mat-option *ngFor="let bank of bancos" [value]="bank.id">{{bank.name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          
+          <mat-form-field appearance="fill">
+            <mat-label>Tipo de Cuenta </mat-label>
+            <mat-select formControlName="tipo_cuenta">
+              <mat-option value="1">Cuenta Corriente</mat-option>
+              <mat-option value="2">Cuenta Vista</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>N° de Cuenta</mat-label>
+            <input matInput formControlName="numero_cuenta">
+        </mat-form-field>
+    </div>
+    <div class="container-button">
+        <div *ngIf="spinner">
+            <mat-spinner></mat-spinner>
+        </div>
+        <div *ngIf="!spinner">
+            <button mat-raised-button color="primary" class="align_button" (click)="guardarDestinatario()">Guardar</button>
+        </div> 
+    </div>
+    </form>
+
+
