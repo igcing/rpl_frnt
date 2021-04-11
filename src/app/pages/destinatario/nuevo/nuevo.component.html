@@ -3,27 +3,25 @@
     <form [formGroup]="formGroup" >
     <div class="container">
     <h3>Nuevo Destinatario </h3>
-    <div *ngIf="!isValid" >
-        <mat-label >{{messageValid}}</mat-label>
-    </div>
-        <mat-form-field appearance="fill">
-            <mat-label>Nombre</mat-label>
-            <input matInput formControlName="nombre">
-        </mat-form-field>
-
         <mat-form-field appearance="fill">
             <mat-label>Rut (sin puntos ni guión)</mat-label>
-            <input matInput formControlName="rut" (change)="formatRut()">
+            <input matInput formControlName="rut"
+            [value]="formGroup.get('rut').value | rut" maxlength="14">
         </mat-form-field>
-
+        
         <mat-form-field appearance="fill">
             <mat-label>Correo</mat-label>
-            <input matInput formControlName="correo">
+            <input matInput formControlName="correo" maxlength="50">
         </mat-form-field>
 
         <mat-form-field appearance="fill">
             <mat-label>Teléfono</mat-label>
-            <input matInput formControlName="telefono">
+            <input matInput formControlName="telefono" maxlength="11">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" maxlength="100">
         </mat-form-field>
 
           <mat-form-field appearance="fill">
@@ -43,7 +41,7 @@
 
           <mat-form-field appearance="fill">
             <mat-label>N° de Cuenta</mat-label>
-            <input matInput formControlName="numero_cuenta">
+            <input matInput formControlName="numero_cuenta" maxlength="20">
         </mat-form-field>
     </div>
     <div class="container-button">

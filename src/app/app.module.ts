@@ -20,6 +20,8 @@ import {MatInputModule} from '@angular/material/input';
 import { HttpClientModule } from '@angular/common/http';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { ToastrModule } from 'ngx-toastr';
+import { RutPipe } from './pipe/rut.pipe';
+import { ReplacecurrencyPipe } from './pipe/replacecurrency.pipe';
 
 @NgModule({
   declarations: [
@@ -27,7 +29,9 @@ import { ToastrModule } from 'ngx-toastr';
     BarComponent,
     GridComponent,
     NuevoComponent,
-    TransferirComponent
+    TransferirComponent,
+    RutPipe,
+    ReplacecurrencyPipe
   ],
   imports: [
     BrowserModule,
@@ -48,7 +52,7 @@ import { ToastrModule } from 'ngx-toastr';
       positionClass: 'toast-top-right'
     })
   ],
-  providers: [BankService],
+  providers: [BankService,RutPipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

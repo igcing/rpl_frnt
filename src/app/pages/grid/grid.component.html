@@ -1,30 +1,38 @@
+<div>
+  <div class="container" *ngIf="spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+  <div *ngIf="!spinner">
 
-<table mat-table [dataSource]="dataSource">
-    <ng-container matColumnDef="rut_persona">
-      <th mat-header-cell *matHeaderCellDef> Rut </th>
-      <td mat-cell *matCellDef="let element"> {{element.rut_persona}} </td>
-    </ng-container>
-  
-    <ng-container matColumnDef="nombre_persona">
-      <th mat-header-cell *matHeaderCellDef> nombre </th>
-      <td mat-cell *matCellDef="let element"> {{element.nombre_persona}} </td>
-    </ng-container>
-  
-    <ng-container matColumnDef="nombre_banco">
-      <th mat-header-cell *matHeaderCellDef> Banco </th>
-      <td mat-cell *matCellDef="let element"> {{element.nombre_banco}} </td>
-    </ng-container>
-  
-    <ng-container matColumnDef="nombre_cuenta">
-      <th mat-header-cell *matHeaderCellDef> Tipo Cuenta </th>
-      <td mat-cell *matCellDef="let element"> {{element.nombre_cuenta}} </td>
-    </ng-container>
-  
-    <ng-container matColumnDef="monto_transferencia">
-      <th mat-header-cell *matHeaderCellDef> Monto </th>
-      <td mat-cell *matCellDef="let element"> {{element.monto_transferencia}} </td>
-    </ng-container>
+    <table mat-table [dataSource]="dataSource">
+      <ng-container matColumnDef="rut_persona">
+        <th mat-header-cell *matHeaderCellDef> Rut </th>
+        <td mat-cell *matCellDef="let element"> {{element.rut_persona | rut}} </td>
+      </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
+      <ng-container matColumnDef="nombre_persona">
+        <th mat-header-cell *matHeaderCellDef> Nombre </th>
+        <td mat-cell *matCellDef="let element"> {{element.nombre_persona}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="nombre_banco">
+        <th mat-header-cell *matHeaderCellDef> Banco </th>
+        <td mat-cell *matCellDef="let element"> {{element.nombre_banco}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="nombre_cuenta">
+        <th mat-header-cell *matHeaderCellDef> Tipo Cuenta </th>
+        <td mat-cell *matCellDef="let element"> {{element.nombre_cuenta}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="monto_transferencia">
+        <th mat-header-cell *matHeaderCellDef> Monto </th>
+        <td mat-cell *matCellDef="let element"> {{element.monto_transferencia | currency:"CLP":"$" | replacecurrency: ',':'.'}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+  </div>
+</div>

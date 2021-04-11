@@ -8,6 +8,8 @@ import { ToastrService } from 'ngx-toastr';
 import { MESSAGE_ERROR_UNEXPECTED, MESSAGE_FORM_INVALID, MESSAGE_PERSONA_SUCCESS, MESSAGE_TRX_SUCCESS } from 'src/app/utils/constants';
 import { Router } from '@angular/router';
 import { bankNameToUniqueNumber } from 'src/app/utils/strUtils';
+import { validatorRut } from 'src/app/validator/rut.validator';
+import { RutPipe } from 'src/app/pipe/rut.pipe';
 
 @Component({
   selector: 'app-nuevo',
@@ -25,7 +27,8 @@ export class NuevoComponent implements OnInit {
   constructor(private destinatarioService: DestinatarioService
     , private bankService: BankService,
     private toastr: ToastrService,
-    private router: Router) { }
+    private router: Router,
+    private rutPipe:RutPipe) { }
 
   ngOnInit(): void {
     this.getBancos();
@@ -34,15 +37,16 @@ export class NuevoComponent implements OnInit {
 
   newForm(){
     this.formGroup = new FormGroup({
-      nombre: new FormControl('', [Validators.required]),
-      rut: new FormControl('', [Validators.required]),
+      nombre: new FormControl('', [Validators.required, Validators.minLength(5)]),
+      rut: new FormControl('', [Validators.required, Validators.minLength(8), validatorRut()]),
       correo: new FormControl('', [Validators.required,Validators.email]),
-      telefono: new FormControl('', [Validators.required,Validators.pattern('[0-9]*')]),
+      telefono: new FormControl('', [Validators.required, Validators.minLength(7),Validators.pattern('[0-9]*')]),
       banco: new FormControl('', [Validators.required]),
       tipo_cuenta: new FormControl('', [Validators.required]),
-      numero_cuenta: new FormControl('', [Validators.required])
-    });
+      numero_cuenta: new FormControl('', [Validators.required, Validators.minLength(3)])
+    }, {updateOn: 'blur'});
   }
+
 
   getBancos(){
     this.bankService.getBanks().then((data) => {
@@ -56,14 +60,7 @@ export class NuevoComponent implements OnInit {
    });  
  }
 
- formatRut(){
-   let rut = this.formGroup.value.rut;
-   rut = rut.replace(".", "");
-   rut = rut.replace("-", "");
-   this.formGroup.controls.rut.setValue(rut);
- }
-
-  findBank() : Banco{
+ findBank() : Banco{
     return this.bancos.filter(banco => banco.id == this.formGroup.value.banco)[0];
   }
 
@@ -71,7 +68,7 @@ export class NuevoComponent implements OnInit {
     if(this.formGroup.valid){
       let bancoselected = this.findBank();
       let destinatarioNuevo: Persona = { nombre_persona: this.formGroup.value.nombre 
-                                      , rut_persona: this.formGroup.value.rut
+                                      , rut_persona: this.rutPipe.cleanRut(this.formGroup.value.rut)
                                       , email_persona: this.formGroup.value.correo
                                       , telefono_persona:this.formGroup.value.telefono
                                       , numero_cuenta: this.formGroup.value.numero_cuenta
@@ -84,7 +81,7 @@ export class NuevoComponent implements OnInit {
       this.destinatarioService.crearDestinatario(destinatarioNuevo).subscribe((success) => {
         this.spinner = false;
         this.toastr.success(MESSAGE_PERSONA_SUCCESS);
-        this.router.navigateByUrl('/transferir');
+        this.router.navigate(['/transferir'], {state: {data: success.body[0] } });
       }, (err) => {
         this.spinner = false;
         this.toastr.error(MESSAGE_ERROR_UNEXPECTED);

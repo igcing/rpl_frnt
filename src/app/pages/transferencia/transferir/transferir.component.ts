@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Banco } from 'src/app/models/banco.interface';
 import { Persona } from 'src/app/models/persona.interface';
 import { Transferencia } from 'src/app/models/transferencia.interface';
+import { RutPipe } from 'src/app/pipe/rut.pipe';
 import { BankService } from 'src/app/services/bank.service';
 import { DestinatarioService } from 'src/app/services/destinatario.service';
 import { TransferenciaService } from 'src/app/services/transferencia.service';
-import { MESSAGE_AMOUNT_INVALID, MESSAGE_ERROR_TOO_VALUE, MESSAGE_ERROR_UNEXPECTED, MESSAGE_FORM_INVALID, MESSAGE_TRX_SUCCESS } from 'src/app/utils/constants';
+import { MESSAGE_AMOUNT_INVALID, MESSAGE_ERROR_TOO_VALUE, MESSAGE_ERROR_UNEXPECTED, MESSAGE_FORM_INVALID, MESSAGE_TRX_SUCCESS, MESSAGE_ERROR_NO_RESULTS } from 'src/app/utils/constants';
 import { bankNameToUniqueNumber } from 'src/app/utils/strUtils';
+import { validatorRut } from 'src/app/validator/rut.validator';
 
 @Component({
   selector: 'app-transferir',
@@ -23,16 +25,27 @@ export class TransferirComponent implements OnInit {
   bancos: Banco[];
   isActiveToTransfer: true;
   messageValid: string = MESSAGE_FORM_INVALID;
-
+  persona: any; // from other form
   constructor(private toastr: ToastrService,
     private transferenciaService: TransferenciaService,
     private destinatarioService: DestinatarioService,
     private bankService: BankService,
-    private router: Router) { }
+    private rutPipe: RutPipe,
+    private router: Router,
+    private activatedRoute:ActivatedRoute) { 
+      if(this.router.getCurrentNavigation() && this.router.getCurrentNavigation().extras.state)
+       this.persona = this.router.getCurrentNavigation().extras.state.data;
+    }
 
   ngOnInit(): void {
+    //console.log(history.state.data);
     this.getBancos();
     this.newForm();
+
+    if(this.persona){
+      this.setFormPersona(this.persona);
+    }
+   
   }
 
   getBancos() {
@@ -50,14 +63,14 @@ export class TransferirComponent implements OnInit {
   newForm() {
     this.formGroup = new FormGroup({
       nombre: new FormControl(''),
-      rut: new FormControl('', [Validators.required]),
+      rut: new FormControl('', [Validators.required, validatorRut()]),
       banco: new FormControl(''),
-      email: new FormControl(''),
-      telefono: new FormControl(''),
+      email: new FormControl({value: '', disabled:true}),
+      telefono: new FormControl({value: '', disabled:true}),
       tipo_cuenta: new FormControl(''),
       numero_cuenta: new FormControl(''),
       monto: new FormControl('', [Validators.pattern('[0-9]*'), Validators.min(1)])
-    });
+    }, {updateOn: 'blur'});
   }
 
   findBank(): Banco {
@@ -83,18 +96,30 @@ export class TransferirComponent implements OnInit {
         if (this.personas.length > 1)
           this.toastr.warning(MESSAGE_ERROR_TOO_VALUE);
         else if (this.personas.length == 1) {
-          this.formGroup.controls.nombre.setValue(this.personas[0].nombre_persona);
-          this.formGroup.controls.email.setValue(this.personas[0].email_persona);
-          this.formGroup.controls.banco.setValue(this.personas[0].code_banco);
-          this.formGroup.controls.tipo_cuenta.setValue("" + this.personas[0].id_cuenta);
-          this.formGroup.controls.numero_cuenta.setValue(this.personas[0].numero_cuenta);
-          this.formGroup.controls.telefono.setValue(this.personas[0].telefono_persona);
-          this.isActiveToTransfer = true;
+          this.setFormPersona(this.personas[0]);
+        } else {
+          this.toastr.error(MESSAGE_ERROR_NO_RESULTS);
         }
       });
     } else {
       this.toastr.error(this.messageValid);
     }
+  }
+
+  setFormPersona(persona: any){
+    this.formGroup.controls.rut.setValue(this.rutPipe.formatRut(persona.rut_persona));
+    
+    this.formGroup.controls.rut.setErrors(null);
+    this.formGroup.controls.rut.clearValidators();
+    this.formGroup.controls.rut.updateValueAndValidity();
+
+    this.formGroup.controls.nombre.setValue(persona.nombre_persona);
+    this.formGroup.controls.email.setValue(persona.email_persona);
+    this.formGroup.controls.banco.setValue(persona.code_banco);
+    this.formGroup.controls.tipo_cuenta.setValue("" + persona.id_cuenta);
+    this.formGroup.controls.numero_cuenta.setValue(persona.numero_cuenta);
+    this.formGroup.controls.telefono.setValue(persona.telefono_persona);
+    this.isActiveToTransfer = true;
   }
 
   enviarTransferencia() {
@@ -103,7 +128,7 @@ export class TransferirComponent implements OnInit {
         monto_transferencia: this.formGroup.value.monto,
         tipo_cuenta: this.formGroup.value.tipo_cuenta,
         code_banco: this.formGroup.value.banco,
-        id_persona_origen: this.formGroup.value.rut
+        id_persona_origen: this.rutPipe.cleanRut(this.formGroup.value.rut)
       };
       this.transferenciaService.enviarTransferencia(data).then((success) => {
         this.toastr.success(MESSAGE_TRX_SUCCESS);

@@ -16,7 +16,6 @@ export class DestinatarioService {
   url:string = environment.endpoint_back+'/persona';
 
   crearDestinatario(persona : Persona){
-    console.log(persona);
     return this.http.post(this.url ,   persona,  getOptions());
   }
 
