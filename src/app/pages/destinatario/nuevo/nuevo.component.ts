@@ -5,7 +5,7 @@ import { Persona } from 'src/app/models/persona.interface';
 import { BankService } from 'src/app/services/bank.service';
 import { DestinatarioService } from 'src/app/services/destinatario.service';
 import { ToastrService } from 'ngx-toastr';
-import { MESSAGE_ERROR_UNEXPECTED, MESSAGE_FORM_INVALID, MESSAGE_PERSONA_SUCCESS, MESSAGE_TRX_SUCCESS } from 'src/app/utils/constants';
+import { MESSAGE_ERROR_DUPLICATED_DEST, MESSAGE_ERROR_UNEXPECTED, MESSAGE_FORM_INVALID, MESSAGE_PERSONA_SUCCESS, MESSAGE_TRX_SUCCESS } from 'src/app/utils/constants';
 import { Router } from '@angular/router';
 import { bankNameToUniqueNumber } from 'src/app/utils/strUtils';
 import { validatorRut } from 'src/app/validator/rut.validator';
@@ -84,7 +84,13 @@ export class NuevoComponent implements OnInit {
         this.router.navigate(['/transferir'], {state: {data: success.body[0] } });
       }, (err) => {
         this.spinner = false;
-        this.toastr.error(MESSAGE_ERROR_UNEXPECTED);
+        if(err.error && err.error.detail){
+          let str:string =err.error.detail;
+          if(str.indexOf('already exists') >= 0)
+            this.toastr.error(MESSAGE_ERROR_DUPLICATED_DEST);
+        } else{
+         this.toastr.error(MESSAGE_ERROR_UNEXPECTED);
+        }
       });
     } else{
       this.toastr.error(this.messageValid);

@@ -26,9 +26,19 @@
   }
   
   .container-button{
-    margin-left: 65%;
+    margin-left: 55%;
   }
 
   .align_button2{
-    margin-left:10%;
+    margin-left:3%;
+  }
+
+  @media only screen and (max-width: 767px) {
+    .container-button{
+      margin-left: 25%;
+    }
+  
+    .align_button2{
+      margin-left:3%;
+    }
   }
